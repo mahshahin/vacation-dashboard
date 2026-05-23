@@ -43,9 +43,9 @@
         .welcome-panel .btn-toggle:hover { background-color: #ffffff; color: #6584f1; }
         
         .form-area { width: 60%; display: flex; justify-content: center; align-items: center; padding: 40px; position: relative; }
-        .form-panel { width: 100%; max-width: 360px; display: none; }
-        .form-panel.active { display: block; }
-        .form-panel h2 { font-size: 24px; color: #333333; margin-bottom: 25px; font-weight: 700; text-align: center; }
+        .form-area .form-panel { width: 100%; max-width: 360px; display: none; }
+        .form-area .form-panel.active { display: block; }
+        .form-area .form-panel h2 { font-size: 24px; color: #333333; margin-bottom: 25px; font-weight: 700; text-align: center; }
         
         .input-group { width: 100%; position: relative; margin-bottom: 18px; }
         .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888888; font-size: 16px; }
@@ -141,7 +141,7 @@
         .filter-group input:focus { border-color: #6584f1; background-color: #ffffff; }
 
         .table-wrapper { overflow-x: auto; width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; min-width: 650px; }
         th { background-color: #f8fafc; color: #64748b; padding: 14px; border-bottom: 1px solid #e2e8f0; font-weight: 600; white-space: nowrap; }
         td { padding: 14px; border-bottom: 1px solid #f1f5f9; color: #334155; white-space: nowrap; }
 
@@ -367,9 +367,9 @@
                     </div>
                     <div class="table-wrapper">
                         <table>
-                            <thead><tr><th>الطلب</th><th>الموظف</th><th>النوع</th><th>الأيام</th><th>القرار الإداري</th></tr></thead>
+                            <thead><tr><th>الطلب</th><th>الموظف</th><th>النوع</th><th>الفترة الزمنية</th><th>الأيام</th><th>القرار الإداري</th></tr></thead>
                             <tbody id="manager-table-body">
-                                <tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات معلقة حالياً.</td></tr>
+                                <tr><td colspan="6" style="text-align:center;color:#999;">لا توجد طلبات معلقة حالياً.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -434,7 +434,7 @@
         let editingRequestId = "";
         let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
         
-        let liveSyncTimer = null; // 🌟 تايمر المزامنة اللحظية في الخلفية
+        let liveSyncTimer = null; 
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('currentUser');
@@ -442,22 +442,21 @@
             if (savedUser && savedPass) {
                 const userObj = JSON.parse(savedUser);
                 silentFetchData(userObj.code, savedPass);
-                startLiveSync(); // تفعيل المزامنة اللحظية آلياً
+                startLiveSync(); 
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
             }
         });
 
-        // 🌟 دالة بدء المزامنة والتحديث اللحظي الصامت كل 10 ثوانٍ بدون شعور المستخدم
         function startLiveSync() {
             if (liveSyncTimer) clearInterval(liveSyncTimer);
             liveSyncTimer = setInterval(() => {
                 const user = JSON.parse(sessionStorage.getItem('currentUser'));
                 const pass = sessionStorage.getItem('currentPass');
-                if (user && pass && !isEditMode) { // نمنع التحديث فقط أثناء وضع التعديل لعدم تشتيت الموظف
+                if (user && pass && !isEditMode) { 
                     silentFetchData(user.code, pass);
                 }
-            }, 10000); // 10000 مللي ثانية = 10 ثوانٍ بالظبط
+            }, 10000); 
         }
 
         function syncEndDateMin() {
@@ -509,7 +508,7 @@
                     sessionStorage.setItem('currentUser', JSON.stringify(data.user));
                     sessionStorage.setItem('currentPass', password);
                     updateDashboardUI(data);
-                    startLiveSync(); // تشغيل التحديث التلقائي فور اللوجن الناجح
+                    startLiveSync(); 
                 } else { alert(data.message); }
             })
             .catch(() => alert("خطأ في الاتصال بالسيرفر الرئيسي."))
@@ -558,7 +557,6 @@
                     badge.innerText = "!"; 
                     badge.style.display = "flex";
                 } else {
-                    // لو الموظف ضغط بنفسه ومسح العلامة نسيبها مقفولة
                     if (badge.innerText !== "!") badge.style.display = "none";
                 }
                 localStorage.setItem('lastAppCount', currentProcessed);
@@ -580,7 +578,7 @@
             }
             
             if(!filtered || filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات معلقة متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#999;">لا توجد طلبات معلقة متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
             }
             
             tbody.innerHTML = filtered.map(l => `
@@ -588,6 +586,7 @@
                     <td>${l.id}</td>
                     <td>${l.name} (${l.code})</td>
                     <td>${l.type}</td>
+                    <td>من ${l.start.split('T')[0]} إلى ${l.end.split('T')[0]}</td>
                     <td>${l.days} يوم</td>
                     <td>
                         <button class="btn-action approve" onclick="processLeave('${l.id}', 'مقبول')">✅ موافق</button>
@@ -724,7 +723,7 @@
             });
 
             document.getElementById('mgr-total-annual').innerText = `${totalAnnual} يوم`;
-            document.getElementById('mgr-total-casual').innerText = `${totalCasual} duration`;
+            document.getElementById('mgr-total-casual').innerText = `${totalCasual} يوم`;
             document.getElementById('mgr-total-holiday').innerText = `${totalHoliday} يوم`;
             
             const targetRecord = approvedLeaves.find(l => l.code && l.code.toLowerCase() === searchCode);
@@ -766,24 +765,24 @@
             
             if(!start || !end) return;
 
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (start < todayStr) {
+                alert("عفواً يا فنان، لا يمكن تقديم طلب إجازة بتاريخ قديم من الماضي! رجاءً اختر تاريخاً يبدأ من اليوم فصاعداً.");
+                return;
+            }
+
             if (end < start) {
                 alert("عفواً يا فنان، لا يمكن أن يكون تاريخ نهاية الإجازة قبل تاريخ بدايتها! رجاءً راجع الحقول.");
                 return;
             }
 
-            // 👑 خط الدفاع الصارم الجديد: منع تداخل التواريخ وتكرار تقديم طلبات في نفس الأيام
             let hasOverlap = cachedEmployeeLeaves.some(l => {
-                // نتجاهل الطلبات المرفوضة تماماً لأنها ملغية
                 if (l.status === 'مرفوض') return false;
-                
-                // في حالة تعديل نفس الطلب نتجاهل مقارنته بنفسه
                 if (isEditMode && l.id === editingRequestId) return false;
 
-                // تحويل فترات الإجازة السابقة لتواريخ صريحة للمقارنة الهندسة
                 let cachedStart = l.start.split('T')[0];
                 let cachedEnd = l.end.split('T')[0];
 
-                // شرط تداخل فترتين برمجياً: (البداية الجديدة قبل نهاية القديمة) و (النهاية الجديدة بعد بداية القديمة)
                 return (start <= cachedEnd && end >= cachedStart);
             });
 
@@ -845,7 +844,7 @@
         }
 
         function handleLogout() { 
-            if (liveSyncTimer) clearInterval(liveSyncTimer); // تصفير التايمر عند الخروج لأمان المتصفح
+            if (liveSyncTimer) clearInterval(liveSyncTimer); 
             sessionStorage.removeItem('currentUser'); 
             sessionStorage.removeItem('currentPass');
             location.reload(); 
