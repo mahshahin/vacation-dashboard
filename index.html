@@ -19,7 +19,6 @@
             padding: 20px;
         }
         
-        /* الحالات الابتدائية مخفية تماماً لمنع الرمشة والخروج التلقائي عند الريفريش */
         .login-screen { display: none; justify-content: center; align-items: center; width: 100%; }
         .dashboard-screen { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
         
@@ -95,7 +94,6 @@
 
         .employee-layout, .manager-layout { display: none; flex-direction: column; gap: 20px; width: 100%; }
         
-        /* شبكة الأرصدة الكومبيوتر */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
         .stat-card { background-color: #ffffff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 15px; }
         .stat-card .icon { width: 46px; height: 46px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
@@ -112,14 +110,12 @@
         .balance-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 4px; font-size: 13px; color: #334155; }
         .balance-row span.remaining { color: #10b981; font-weight: 700; }
 
-        /* تقسيم الكومبيوتر المتوازن */
         .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; }
         .manager-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; } 
         
         .content-box { background-color: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
         .content-box h3 { font-size: 16px; color: #333; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; }
 
-        /* هندسة ترويسة صندوق السجل والمحافظة على الفلاتر الكبرى */
         .history-header { 
             display: flex; 
             justify-content: space-between; 
@@ -160,41 +156,27 @@
         .btn-action.edit-btn { background-color: #e0e8f6; color: #4e6edb; } 
         .btn-action.delete-btn { background-color: #fdf2f2; color: #ef4444; }
 
-        /* ==================== 📱 قـواعد الـ Media Queries للموبايل ==================== */
         @media (max-width: 768px) {
             body { padding: 12px; align-items: flex-start; width: 100vw; overflow-x: hidden; } 
-            
             .login-container { flex-direction: column; width: 100%; max-width: 400px; height: auto; }
             .welcome-panel { width: 100%; padding: 30px 20px; border-radius: 0 0 24px 24px; }
             .form-area { width: 100%; padding: 30px 20px; min-height: auto; }
-            
             .dashboard-screen { gap: 16px; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; } 
             .main-grid, .manager-grid { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
-            
             .dashboard-header { flex-direction: column; text-align: center; padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px; box-sizing: border-box !important; }
             .notification-container { position: static; margin-top: 10px; margin-bottom: 2px; }
             .btn-logout { position: static; margin-top: 8px; width: 100%; justify-content: center; }
-            
             .stats-grid { grid-template-columns: 1fr; gap: 12px; width: 100% !important; margin: 0 0 16px 0 !important; padding: 0 !important; box-sizing: border-box !important; }
             .stat-card { padding: 16px !important; width: 100% !important; margin: 0 !important; border-radius: 14px; box-sizing: border-box !important; } 
-            
-            .content-box { 
-                padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px !important; box-sizing: border-box !important; 
-            } 
-            
+            .content-box { padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px !important; box-sizing: border-box !important; } 
             .content-box form { width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
             .content-box .input-group { width: 100% !important; margin-bottom: 12px !important; box-sizing: border-box !important; }
-            
-            .content-box .input-group input, .content-box .input-group select { 
-                width: 100% !important; box-sizing: border-box !important; padding: 12px 15px 12px 35px !important; font-size: 13px !important;
-            }
+            .content-box .input-group input, .content-box .input-group select { width: 100% !important; box-sizing: border-box !important; padding: 12px 15px 12px 35px !important; font-size: 13px !important; }
             .content-box .input-group i { left: 12px; font-size: 14px; }
-            
             .history-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .filters-container { width: 100%; flex-direction: column; gap: 10px; }
             .filter-group { width: 100%; justify-content: space-between; }
             .filter-group input, .filter-group select { width: 65% !important; padding: 8px 10px; box-sizing: border-box !important; } 
-            
             table { font-size: 13px; }
             th, td { padding: 10px 8px; }
         }
@@ -447,10 +429,12 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbKwLSbJs4HOlLdFk-LKBm9iIOxY16fmusxlhmaV7fxD9ZqooliykKrQ72l6THaYYX/exec"; 
         let cachedAllLeaves = [];
         let cachedEmployeeLeaves = [];
-        let cachedManagerPending = []; // مصفوفة لحفظ الطلبات المعلقة محلياً لفلترتها فوراً
+        let cachedManagerPending = []; 
         let isEditMode = false;
         let editingRequestId = "";
         let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
+        
+        let liveSyncTimer = null; // 🌟 تايمر المزامنة اللحظية في الخلفية
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('currentUser');
@@ -458,10 +442,23 @@
             if (savedUser && savedPass) {
                 const userObj = JSON.parse(savedUser);
                 silentFetchData(userObj.code, savedPass);
+                startLiveSync(); // تفعيل المزامنة اللحظية آلياً
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
             }
         });
+
+        // 🌟 دالة بدء المزامنة والتحديث اللحظي الصامت كل 10 ثوانٍ بدون شعور المستخدم
+        function startLiveSync() {
+            if (liveSyncTimer) clearInterval(liveSyncTimer);
+            liveSyncTimer = setInterval(() => {
+                const user = JSON.parse(sessionStorage.getItem('currentUser'));
+                const pass = sessionStorage.getItem('currentPass');
+                if (user && pass && !isEditMode) { // نمنع التحديث فقط أثناء وضع التعديل لعدم تشتيت الموظف
+                    silentFetchData(user.code, pass);
+                }
+            }, 10000); // 10000 مللي ثانية = 10 ثوانٍ بالظبط
+        }
 
         function syncEndDateMin() {
             const startDate = document.getElementById('leave-start').value;
@@ -512,6 +509,7 @@
                     sessionStorage.setItem('currentUser', JSON.stringify(data.user));
                     sessionStorage.setItem('currentPass', password);
                     updateDashboardUI(data);
+                    startLiveSync(); // تشغيل التحديث التلقائي فور اللوجن الناجح
                 } else { alert(data.message); }
             })
             .catch(() => alert("خطأ في الاتصال بالسيرفر الرئيسي."))
@@ -533,7 +531,7 @@
                 empLayout.style.display = 'none';   
                 
                 cachedManagerPending = data.managerPending || [];
-                filterManagerPendingTable(); // رندر فوري للجدول المعلق
+                filterManagerPendingTable(); 
                 
                 cachedAllLeaves = data.allLeaves || [];
                 filterHistoryByMonth(); 
@@ -560,13 +558,13 @@
                     badge.innerText = "!"; 
                     badge.style.display = "flex";
                 } else {
-                    badge.style.display = "none";
+                    // لو الموظف ضغط بنفسه ومسح العلامة نسيبها مقفولة
+                    if (badge.innerText !== "!") badge.style.display = "none";
                 }
                 localStorage.setItem('lastAppCount', currentProcessed);
             }
         }
 
-        // 🆕 دالة الفلترة الذكية لجدول الطلبات المعلقة (بانتظار الاعتماد) عند المدير
         function filterManagerPendingTable() {
             const searchCode = document.getElementById('pending-emp-code').value.trim().toLowerCase();
             const selectedMonth = document.getElementById('pending-month-filter').value;
@@ -601,6 +599,7 @@
 
         function clearNotificationBadge() {
             document.getElementById('main-bell-badge').style.display = "none";
+            document.getElementById('main-bell-badge').innerText = "0";
         }
 
         function refreshDashboardData() {
@@ -620,7 +619,6 @@
                 }
             }).catch(err => {
                 console.log("خطأ أثناء تحديث البيانات بالخلفية:", err);
-                document.getElementById('login-screen').style.display = 'flex';
             });
         }
 
@@ -726,7 +724,7 @@
             });
 
             document.getElementById('mgr-total-annual').innerText = `${totalAnnual} يوم`;
-            document.getElementById('mgr-total-casual').innerText = `${totalCasual} يوم`;
+            document.getElementById('mgr-total-casual').innerText = `${totalCasual} duration`;
             document.getElementById('mgr-total-holiday').innerText = `${totalHoliday} يوم`;
             
             const targetRecord = approvedLeaves.find(l => l.code && l.code.toLowerCase() === searchCode);
@@ -770,6 +768,27 @@
 
             if (end < start) {
                 alert("عفواً يا فنان، لا يمكن أن يكون تاريخ نهاية الإجازة قبل تاريخ بدايتها! رجاءً راجع الحقول.");
+                return;
+            }
+
+            // 👑 خط الدفاع الصارم الجديد: منع تداخل التواريخ وتكرار تقديم طلبات في نفس الأيام
+            let hasOverlap = cachedEmployeeLeaves.some(l => {
+                // نتجاهل الطلبات المرفوضة تماماً لأنها ملغية
+                if (l.status === 'مرفوض') return false;
+                
+                // في حالة تعديل نفس الطلب نتجاهل مقارنته بنفسه
+                if (isEditMode && l.id === editingRequestId) return false;
+
+                // تحويل فترات الإجازة السابقة لتواريخ صريحة للمقارنة الهندسة
+                let cachedStart = l.start.split('T')[0];
+                let cachedEnd = l.end.split('T')[0];
+
+                // شرط تداخل فترتين برمجياً: (البداية الجديدة قبل نهاية القديمة) و (النهاية الجديدة بعد بداية القديمة)
+                return (start <= cachedEnd && end >= cachedStart);
+            });
+
+            if (hasOverlap) {
+                alert("عفواً يا فنان! لديك طلب إجازة آخر (مقبول أو قيد الانتظار) يتداخل مع هذه الفترة بالظبط. رجاءً راجع جدول سجل طلباتك.");
                 return;
             }
 
@@ -826,6 +845,7 @@
         }
 
         function handleLogout() { 
+            if (liveSyncTimer) clearInterval(liveSyncTimer); // تصفير التايمر عند الخروج لأمان المتصفح
             sessionStorage.removeItem('currentUser'); 
             sessionStorage.removeItem('currentPass');
             location.reload(); 
