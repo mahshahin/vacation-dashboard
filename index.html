@@ -579,16 +579,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedEmployeeLeaves = data.myLeaves || [];
                 filterEmployeeLeavesByMonth();
 
+                // 🔔 حساب الطلبات المعتمدة/المرفوضة حالياً
                 let currentProcessed = cachedEmployeeLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض').length;
+                
+                // 🚀 لو فيه قرار جديد صدر والعدد زاد عن آخر عدد الموظف شافه
                 if (currentProcessed > lastApprovedCount && lastApprovedCount !== 0) {
                     badge.innerText = "!"; 
                     badge.style.display = "flex";
+                    
+                    // إطلاق الـ Alert التفاعلي فوراً
+                    alert("🔔 تنبيه: تم تحديث حالة طلبات الإجازات الخاصة بك من قبل الإدارة! رجاءً مراجعة السجل.");
+                    
+                    // تحديث العداد فوراً عشان الـ اليرت ميتكررش في الـ 10 ثوانٍ اللي جاية
+                    lastApprovedCount = currentProcessed;
+                    localStorage.setItem('lastAppCount', currentProcessed);
                 } else {
-                    if (badge.innerText !== "!") badge.style.display = "none";
+                    // لو الموظف مش واضع علامة الإشعار، نضمن قفلها صامتاً
+                    if (badge.innerText !== "!") {
+                        badge.style.display = "none";
+                    }
                 }
-                localStorage.setItem('lastAppCount', currentProcessed);
+                
+                // تأمين حفظ الحالة الابتدائية لو أول مرة يفتح الحساب تماماً
+                if (lastApprovedCount === 0) {
+                    localStorage.setItem('lastAppCount', currentProcessed);
+                    lastApprovedCount = currentProcessed;
+                }
             }
-        }
 
         function filterManagerPendingTable() {
             const searchCode = document.getElementById('pending-emp-code').value.trim().toLowerCase();
