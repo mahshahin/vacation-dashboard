@@ -459,16 +459,43 @@
             }, 10000); 
         }
 
-        function syncEndDateMin() {
-            const startDate = document.getElementById('leave-start').value;
-            const endDateInput = document.getElementById('leave-end');
-            if (startDate) {
-                endDateInput.min = startDate;
-                if (endDateInput.value && endDateInput.value < startDate) {
-                    endDateInput.value = startDate;
-                }
+        // دالة تأمين التواريخ ومنع اختيار أي تاريخ قديم من الماضي (للبداية والنهاية)
+function setupDateConstraints() {
+    const startDateInput = document.getElementById('leave-start');
+    const endDateInput = document.getElementById('leave-end');
+    
+    // 1. حساب تاريخ اليوم الحالي بتوقيت مصر بصيغة YYYY-MM-DD
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = ("0" + (today.getMonth() + 1)).slice(-2);
+    const day = ("0" + today.getDate()).slice(-2);
+    const todayStr = `${year}-${month}-${day}`;
+    
+    // 2. إجبار تاريخ البداية والنهاية ألا يقبلا أي يوم قبل النهاردة (حظر الماضي تماماً)
+    startDateInput.min = todayStr;
+    if (!endDateInput.min) {
+        endDateInput.min = todayStr;
+    }
+
+    // 3. مراقبة التغيير: أول ما يختار البداية، تقفل تقويم النهاية على التواريخ اللي قبلها
+    startDateInput.addEventListener('change', function() {
+        const selectedStart = startDateInput.value;
+        if (selectedStart) {
+            endDateInput.min = selectedStart; // النهاية تبدأ من يوم البداية فصاعداً
+            
+            // لو الموظف كان كاتب تاريخ نهاية قديم بالخطأ، يصححه تلقائياً لنفس يوم البداية
+            if (endDateInput.value && endDateInput.value < selectedStart) {
+                endDateInput.value = selectedStart;
             }
         }
+    });
+}
+
+// تشغيل الدالة تلقائياً فور تحميل الصفحة لتأمين الحقول فوراً
+document.addEventListener('DOMContentLoaded', () => {
+    // أضف هذا السطر جوه دالة الـ DOMContentLoaded الموجودة عندك بالأسفل
+    setupDateConstraints();
+});
 
         function toggleForm() {
             const loginPanel = document.getElementById('login-panel'); const registerPanel = document.getElementById('register-panel');
