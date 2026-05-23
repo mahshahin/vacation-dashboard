@@ -19,7 +19,7 @@
             padding: 20px;
         }
         
-        /* 🌟 جعل الحالات الابتدائية مخفية تماماً لمنع الرمشة والخروج التلقائي عند الريفريش */
+        /* الحالات الابتدائية مخفية تماماً لمنع الرمشة والخروج التلقائي عند الريفريش */
         .login-screen { display: none; justify-content: center; align-items: center; width: 100%; }
         .dashboard-screen { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
         
@@ -95,6 +95,7 @@
 
         .employee-layout, .manager-layout { display: none; flex-direction: column; gap: 20px; width: 100%; }
         
+        /* شبكة الأرصدة الكومبيوتر */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
         .stat-card { background-color: #ffffff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 15px; }
         .stat-card .icon { width: 46px; height: 46px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
@@ -111,17 +112,34 @@
         .balance-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 4px; font-size: 13px; color: #334155; }
         .balance-row span.remaining { color: #10b981; font-weight: 700; }
 
+        /* تقسيم الكومبيوتر المتوازن */
         .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; }
         .manager-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; } 
         
         .content-box { background-color: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
         .content-box h3 { font-size: 16px; color: #333; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; }
 
-        .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; margin-bottom: 20px; }
+        /* 🛠️ هندسة ترويسة صندوق السجل لمنع اختفاء أو سقوط فلاتر المدير والموظف */
+        .history-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #f0f2f7; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; /* تسمح بمرونة التوزيع لمنع كسر المحاذاة */
+            gap: 15px;
+        }
         .history-header h3 { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .filters-container { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        
+        .filters-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
         .filter-group { display: flex; align-items: center; gap: 8px; }
-        .filter-group label { font-size: 13px; color: #64748b; font-weight: 600; }
+        .filter-group label { font-size: 13px; color: #64748b; font-weight: 600; white-space: nowrap; }
         .filter-group select, .filter-group input { padding: 6px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; background-color: #f8fafc; font-family: 'Cairo', sans-serif; }
         .filter-group input { width: 140px; }
         .filter-group input:focus { border-color: #6584f1; background-color: #ffffff; }
@@ -172,7 +190,7 @@
             }
             .content-box .input-group i { left: 12px; font-size: 14px; }
             
-            .history-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .history-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .filters-container { width: 100%; flex-direction: column; gap: 10px; }
             .filter-group { width: 100%; justify-content: space-between; }
             .filter-group input, .filter-group select { width: 65% !important; padding: 8px 10px; box-sizing: border-box !important; } 
@@ -267,7 +285,7 @@
                 
                 <div class="content-box">
                     <div class="history-header">
-                        <h3>سجل طلباتك ومتابعة الحالة (اسحب ↔️)</h3>
+                        <h3>سجل طلباتك ومتابعة الحالة</h3>
                         <div class="filter-group">
                             <label for="emp-month-filter">عرض حسب الشهر:</label>
                             <select id="emp-month-filter" onchange="filterEmployeeLeavesByMonth()">
@@ -338,7 +356,7 @@
                 </div>
 
                 <div class="content-box">
-                    <h3>طلبات الإجازات بانتظار الاعتماد (اسحب ↔️)</h3>
+                    <h3>طلبات الإجازات بانتظار الاعتماد</h3>
                     <div class="table-wrapper">
                         <table>
                             <thead><tr><th>الطلب</th><th>الموظف</th><th>النوع</th><th>الأيام</th><th>القرار الإداري</th></tr></thead>
@@ -352,7 +370,7 @@
 
             <div class="content-box" style="margin-top: 5px;">
                 <div class="history-header">
-                    <h3>سجل الإجازات السابق السنوي (الطلبات المعتمدة والمرفوضة)</h3>
+                    <h3>سجل الإجازات السابق السنوي</h3>
                     <div class="filters-container">
                         <div class="filter-group">
                             <label for="search-emp-code"><i class="fa-solid fa-magnifying-glass"></i> كود الموظف:</label>
@@ -400,7 +418,7 @@
 
     <script>
         let isLoginView = true;
-        <!-- 🌟 الرابط الرئيسي للتعامل مع جميع طلبات التسجيل، الدخول، إدارة الإجازات، والبيانات -->
+        <!-- رابط السكريبت الخاص بجوجل شيت والذي يحتوي على جميع الوظائف البرمجية للتعامل مع البيانات -->
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbKwLSbJs4HOlLdFk-LKBm9iIOxY16fmusxlhmaV7fxD9ZqooliykKrQ72l6THaYYX/exec"; 
         let cachedAllLeaves = [];
         let cachedEmployeeLeaves = [];
@@ -408,7 +426,6 @@
         let editingRequestId = "";
         let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
 
-        // 🌟 فحص الكاش الفوري عند تحميل الـ DOM لاتخاذ القرار صامتاً قبل أي رندر مرئي للشاشات
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('currentUser');
             const savedPass = sessionStorage.getItem('currentPass');
@@ -416,7 +433,6 @@
                 const userObj = JSON.parse(savedUser);
                 silentFetchData(userObj.code, savedPass);
             } else {
-                // لو مفيش كاش يفتح صفحة اللوجن صامتة وبدون رمش
                 document.getElementById('login-screen').style.display = 'flex';
             }
         });
@@ -477,7 +493,6 @@
         }
 
         function updateDashboardUI(data) {
-            // إخفاء شاشة اللوجن تماماً وإظهار الداشبورد
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('dashboard-screen').style.display = 'flex';
             document.getElementById('db-user-name').innerText = data.user.name;
@@ -544,7 +559,6 @@
                 }
             }).catch(err => {
                 console.log("خطأ أثناء تحديث البيانات بالخلفية:", err);
-                // في حالة فشل التحديث الصامت لسبب طارئ، نؤمن العرض بفتح اللوجن
                 document.getElementById('login-screen').style.display = 'flex';
             });
         }
