@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الإجازات الإلكتروني المشترك</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        
+        body { 
+            background-color: #eef2f9; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+        
+        /* ==================== 🚪 شاشة تسجيل الدخول المتجاوبة ==================== */
+        .login-screen { display: flex; justify-content: center; align-items: center; width: 100%; }
+        
+        .login-container {
+            background-color: #ffffff; width: 900px; max-width: 100%; min-height: 500px;
+            border-radius: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); 
+            display: flex; overflow: hidden; transition: all 0.3s ease;
+        }
+        
+        .welcome-panel {
+            background: linear-gradient(135deg, #6584f1, #4e6edb); color: #ffffff; 
+            width: 40%; display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; padding: 40px 25px; text-align: center; position: relative;
+        }
+        .welcome-panel h1 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .welcome-panel p { font-size: 14px; opacity: 0.9; margin-bottom: 25px; line-height: 1.6; }
+        .welcome-panel .btn-toggle { 
+            background: transparent; color: #ffffff; border: 2px solid #ffffff; 
+            padding: 8px 30px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; 
+            transition: 0.3s;
+        }
+        .welcome-panel .btn-toggle:hover { background-color: #ffffff; color: #6584f1; }
+        
+        .form-area { width: 60%; display: flex; justify-content: center; align-items: center; padding: 40px; position: relative; }
+        .form-panel { width: 100%; max-width: 360px; display: none; }
+        .form-panel.active { display: block; }
+        .form-panel h2 { font-size: 24px; color: #333333; margin-bottom: 25px; font-weight: 700; text-align: center; }
+        
+        .input-group { width: 100%; position: relative; margin-bottom: 18px; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888888; font-size: 16px; }
+        .input-group input, .input-group select { 
+            width: 100%; padding: 13px 20px 13px 45px; border: 1.5px solid #e2e8f0; 
+            background-color: #f8fafc; border-radius: 10px; font-size: 14px; color: #333333; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus, .input-group select:focus { border-color: #6584f1; background-color: #ffffff; }
+        
+        .btn-main { 
+            width: 100%; background-color: #6584f1; color: #ffffff; border: none; padding: 13px; 
+            border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(101, 132, 241, 0.2); transition: 0.3s;
+        }
+        .btn-main:hover { background-color: #4e6edb; }
+
+        /* ==================== 📊 شاشة الداشبورد الشاملة المتجاوبة ==================== */
+        .dashboard-screen { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
+        
+        .dashboard-header { 
+            background-color: #ffffff; padding: 20px 30px; border-radius: 18px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 20px; position: relative; 
+            width: 100%;
+        }
+        .user-avatar { background-color: #e0e8f6; color: #6584f1; width: 52px; height: 52px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 22px; }
+        .user-info h3 { font-size: 17px; color: #333; font-weight: 700; }
+        .user-info p { font-size: 13px; color: #777; }
+        
+        .notification-container {
+            position: absolute; left: 140px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .notification-bell {
+            background-color: #f1f5f9; color: #475569; width: 40px; height: 40px; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: 18px; position: relative; transition: 0.3s;
+        }
+        .notification-bell:hover { background-color: #e2e8f0; color: #1e293b; }
+        
+        .notification-badge {
+            position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: #ffffff;
+            font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%;
+            display: none; align-items: center; justify-content: center; padding: 0 4px;
+            border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-logout { 
+            position: absolute; left: 30px; background-color: #ffeeee; color: #ff5b5b; border: none; 
+            padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; 
+        }
+
+        .employee-layout, .manager-layout { display: none; flex-direction: column; gap: 20px; width: 100%; }
+        
+        /* شبكة الأرصدة الكومبيوتر */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+        .stat-card { background-color: #ffffff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 15px; }
+        .stat-card .icon { width: 46px; height: 46px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+        
+        .stat-card.blue .icon { background-color: #e8ebf9; color: #6584f1; }
+        .stat-card.orange .icon { background-color: #fff2e8; color: #ff9343; }
+        .stat-card.green .icon { background-color: #e6f9f0; color: #10b981; }
+        
+        .stat-card h4 { font-size: 13px; color: #777; }
+        .stat-card h2 { font-size: 22px; color: #333; font-weight: 700; margin-top: 2px; }
+        
+        .card-balances { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+        .card-balances h4 { font-size: 12px; color: #64748b; font-weight: 600; }
+        .balance-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 4px; font-size: 13px; color: #334155; }
+        .balance-row span.remaining { color: #10b981; font-weight: 700; }
+
+        /* تقسيم الكومبيوتر المتوازن (الصندوق صغير وبجانب السجل العريض) */
+        .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; }
+        .manager-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; } 
+        
+        .content-box { background-color: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
+        .content-box h3 { font-size: 16px; color: #333; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; }
+
+        /* ترويسة صندوق السجل */
+        .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; margin-bottom: 20px; }
+        .history-header h3 { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .filters-container { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 13px; color: #64748b; font-weight: 600; }
+        .filter-group select, .filter-group input { padding: 6px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; background-color: #f8fafc; font-family: 'Cairo', sans-serif; }
+        .filter-group input { width: 140px; }
+        .filter-group input:focus { border-color: #6584f1; background-color: #ffffff; }
+
+        .table-wrapper { overflow-x: auto; width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; min-width: 600px; }
+        th { background-color: #f8fafc; color: #64748b; padding: 14px; border-bottom: 1px solid #e2e8f0; font-weight: 600; white-space: nowrap; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; color: #334155; white-space: nowrap; }
+
+        .badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge.pending { background-color: #fff7ed; color: #c2410c; }
+        .badge.approved { background-color: #f0fdf4; color: #15803d; }
+        .badge.rejected { background-color: #fef2f2; color: #b91c1c; }
+
+        .btn-action { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; margin-left: 5px; }
+        .btn-action.approve { background-color: #f0fdf4; color: #16a34a; }
+        .btn-action.reject { background-color: #fef2f2; color: #dc2626; }
+        .btn-action.edit-btn { background-color: #e0e8f6; color: #4e6edb; } 
+        .btn-action.delete-btn { background-color: #fdf2f2; color: #ef4444; } /* ستايل زر سلة المهملات الجذاب للإلغاء */
+
+        /* ==================== 📱 قـواعد الـ Media Queries للموبايل ==================== */
+        @media (max-width: 768px) {
+            body { padding: 12px; align-items: flex-start; width: 100vw; overflow-x: hidden; } 
+            
+            .login-container { flex-direction: column; width: 100%; max-width: 400px; height: auto; }
+            .welcome-panel { width: 100%; padding: 30px 20px; border-radius: 0 0 24px 24px; }
+            .form-area { width: 100%; padding: 30px 20px; min-height: auto; }
+            
+            .dashboard-screen { gap: 16px; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; } 
+            
+            /* تحويل الـ Grids لـ Block على الموبايل لتنزل العناصر تحت بعضها بالتوازي التام وبدون أي تداخل */
+            .main-grid, .manager-grid { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+            
+            .dashboard-header { flex-direction: column; text-align: center; padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px; box-sizing: border-box !important; }
+            .notification-container { position: static; margin-top: 10px; margin-bottom: 2px; }
+            .btn-logout { position: static; margin-top: 8px; width: 100%; justify-content: center; }
+            
+            .stats-grid { grid-template-columns: 1fr; gap: 12px; width: 100% !important; margin: 0 0 16px 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+            .stat-card { padding: 16px !important; width: 100% !important; margin: 0 !important; border-radius: 14px; box-sizing: border-box !important; } 
+            
+            /* حشو الصناديق المتساوي على الموبايل لضبط خط المحاذاة الشامل */
+            .content-box { 
+                padding: 16px !important; 
+                width: 100% !important; 
+                margin: 0 0 16px 0 !important; 
+                border-radius: 14px !important; 
+                box-sizing: border-box !important; 
+            } 
+            
+            .content-box form { width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+            .content-box .input-group { width: 100% !important; margin-bottom: 12px !important; box-sizing: border-box !important; }
+            
+            .content-box .input-group input, .content-box .input-group select { 
+                width: 100% !important; box-sizing: border-box !important; padding: 12px 15px 12px 35px !important; font-size: 13px !important;
+            }
+            .content-box .input-group i { left: 12px; font-size: 14px; }
+            
+            .history-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .filters-container { width: 100%; flex-direction: column; gap: 10px; }
+            .filter-group { width: 100%; justify-content: space-between; }
+            .filter-group input, .filter-group select { width: 65% !important; padding: 8px 10px; box-sizing: border-box !important; } 
+            
+            table { font-size: 13px; }
+            th, td { padding: 10px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-screen" id="login-screen">
+        <div class="login-container">
+            <div class="welcome-panel">
+                <h1 id="welcome-title">مرحباً بك!</h1>
+                <p id="welcome-desc">نظام تقديم ومتابعة الإجازات الإلكتروني التفاعلي. إذا كنت موظفاً جديداً، اضغط لتسجيل حسابك.</p>
+                <button class="btn-toggle" id="toggle-btn" onclick="toggleForm()">إنشاء حساب</button>
+            </div>
+            <div class="form-area">
+                <div class="form-panel login-form active" id="login-panel">
+                    <h2>تسجيل الدخول</h2>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="input-group"><input type="text" id="login-code" placeholder="الكود الوظيفي" required><i class="fa-solid fa-key"></i></div>
+                        <div class="input-group"><input type="password" id="login-pass" placeholder="كلمة المرور" required><i class="fa-solid fa-lock"></i></div>
+                        <button type="submit" class="btn-main">دخول</button>
+                    </form>
+                </div>
+                <div class="form-panel register-form" id="register-panel">
+                    <h2>حساب جديد</h2>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="input-group"><input type="text" id="reg-code" placeholder="الكود الوظيفي المعتمد" required><i class="fa-solid fa-key"></i></div>
+                        <div class="input-group"><input type="password" id="reg-pass" placeholder="اختر كلمة المرور" required><i class="fa-solid fa-lock"></i></div>
+                        <button type="submit" class="btn-main">إنشاء الحساب</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-screen" id="dashboard-screen">
+        <div class="dashboard-header">
+            <div class="user-avatar"><i class="fa-solid fa-user-gear"></i></div>
+            <div class="user-info">
+                <h3 id="db-user-name">اسم الموظف</h3>
+                <p id="db-user-dept-role">القسم والوظيفة</p>
+            </div>
+            
+            <div class="notification-container" onclick="clearNotificationBadge()" title="الإشعارات التنبيهية">
+                <div class="notification-bell">
+                    <i class="fa-solid fa-bell"></i>
+                    <div class="notification-badge" id="main-bell-badge">0</div>
+                </div>
+            </div>
+
+            <button class="btn-logout" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+        </div>
+
+        <div class="employee-layout" id="employee-layout">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div><h4>رصيد إجازات اعتيادي</h4><h2 id="lbl-annual">0 يوم</h2></div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="icon"><i class="fa-solid fa-calendar-minus"></i></div>
+                    <div><h4>رصيد إجازات عارضة</h4><h2 id="lbl-casual">0 يوم</h2></div>
+                </div>
+                <div class="stat-card green">
+                    <div class="icon"><i class="fa-solid fa-holly-berry"></i></div>
+                    <div><h4>بدل أعياد رسمية</h4><h2 id="lbl-holiday">0 يوم</h2></div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <div class="content-box">
+                    <h3 id="form-action-title">طلب إجازة جديد</h3>
+                    <form id="leave-form" onsubmit="handleLeaveSubmit(event)">
+                        <div class="input-group">
+                            <select id="leave-type" required>
+                                <option value="" disabled selected>اختر نوع الإجازة</option>
+                                <option value="اعتيادي">إجازة اعتيادية</option>
+                                <option value="عارضة">إجازة عارضة</option>
+                                <option value="بدل أعياد">بدل أعياد رسمية</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><input type="date" id="leave-start" required title="من تاريخ" onchange="syncEndDateMin()"></div>
+                        <div class="input-group"><input type="date" id="leave-end" required title="إلى تاريخ"></div>
+                        <button type="submit" id="btn-submit-text" class="btn-main">إرسال الطلب</button>
+                        <button type="button" id="btn-cancel-edit" class="btn-main" style="background-color:#ffeeee; color:#ff5b5b; margin-top:8px; display:none;" onclick="cancelEditMode()">إلغاء التعديل</button>
+                    </form>
+                </div>
+                
+                <div class="content-box">
+                    <div class="history-header">
+                        <h3>سجل طلباتك ومتابعة الحالة (اسحب ↔️)</h3>
+                        <div class="filter-group">
+                            <label for="emp-month-filter">عرض حسب الشهر:</label>
+                            <select id="emp-month-filter" onchange="filterEmployeeLeavesByMonth()">
+                                <option value="all">كل الشهور</option>
+                                <option value="01">يناير (01)</option>
+                                <option value="02">فبراير (02)</option>
+                                <option value="03">مارس (03)</option>
+                                <option value="04">أبريل (04)</option>
+                                <option value="05">مايو (05)</option>
+                                <option value="06">يونيو (06)</option>
+                                <option value="07">يوليو (07)</option>
+                                <option value="08">أغسطس (08)</option>
+                                <option value="09">سبتمبر (09)</option>
+                                <option value="10">أكتوبر (10)</option>
+                                <option value="11">نوفمبر (11)</option>
+                                <option value="12">ديسمبر (12)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>معرف الطلب</th><th>نوع الإجازة</th><th>الفترة</th><th>الأيام</th><th>الحالة</th></tr></thead>
+                            <tbody id="employee-table-body">
+                                <tr><td colspan="5" style="text-align: center; color: #999;">لا توجد طلبات سابقة.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="manager-layout" id="manager-layout">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="icon"><i class="fa-solid fa-chart-bar"></i></div>
+                    <div class="card-balances">
+                        <h4>إجمالي الاعتيادي المستهلك (للموظفين)</h4>
+                        <h2 id="mgr-total-annual">0 يوم</h2>
+                        <div class="balance-row">المتبقي للموظف: <span id="mgr-rem-annual" class="remaining">--</span></div>
+                    </div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="card-balances">
+                        <h4>إجمالي العارضة المستهلك (للموظفين)</h4>
+                        <h2 id="mgr-total-casual">0 يوم</h2>
+                        <div class="balance-row">المتبقي للموظف: <span id="mgr-rem-casual" class="remaining">--</span></div>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                    <div class="card-balances">
+                        <h4>إجمالي بدل الأعياد المستهلك (للموظفين)</h4>
+                        <h2 id="mgr-total-holiday">0 يوم</h2>
+                        <div class="balance-row">المتبقي للموظف: <span id="mgr-rem-holiday" class="remaining">--</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="manager-grid">
+                <div class="content-box">
+                    <h3>تعديل أرصدة الموظفين</h3>
+                    <form onsubmit="handleUpdateHoliday(event)">
+                        <div class="input-group"><input type="text" id="target-emp-code" placeholder="كود الموظف المستهدف" required></div>
+                        <div class="input-group"><input type="number" id="new-holiday-balance" placeholder="الرصيد الجديد" required min="0"></div>
+                        <button type="submit" class="btn-main" style="background-color: #10b981;">تحديث الرصيد</button>
+                    </form>
+                </div>
+
+                <div class="content-box">
+                    <h3>طلبات الإجازات بانتظار الاعتماد (اسحب ↔️)</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>الطلب</th><th>الموظف</th><th>النوع</th><th>الأيام</th><th>القرار الإداري</th></tr></thead>
+                            <tbody id="manager-table-body">
+                                <tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات معلقة حالياً.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-box" style="margin-top: 5px;">
+                <div class="history-header">
+                    <h3>سجل الإجازات السابق السنوي (الطلبات المعتمدة والمرفوضة)</h3>
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="search-emp-code"><i class="fa-solid fa-magnifying-glass"></i> كود الموظف:</label>
+                            <input type="text" id="search-emp-code" placeholder="ابحث بكود الموظف..." oninput="filterHistoryByMonth()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="month-filter">الشهر:</label>
+                            <select id="month-filter" onchange="filterHistoryByMonth()">
+                                <option value="all">كل الشهور</option>
+                                <option value="01">يناير (01)</option>
+                                <option value="02">فبراير (02)</option>
+                                <option value="03">مارس (03)</option>
+                                <option value="04">أبريل (04)</option>
+                                <option value="05">مايو (05)</option>
+                                <option value="06">يونيو (06)</option>
+                                <option value="07">يوليو (07)</option>
+                                <option value="08">أغسطس (08)</option>
+                                <option value="09">سبتمبر (09)</option>
+                                <option value="10">أكتوبر (10)</option>
+                                <option value="11">نوفمبر (11)</option>
+                                <option value="12">ديسمبر (12)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                    <th>الطلب</th>
+                                    <th>الموظف</th>
+                                    <th>نوع الإجازة</th>
+                                    <th>الأيام</th>
+                                    <th>الحالة النهائية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manager-history-table-body">
+                            <tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات متوافقة مع اختيارات البحث الحالية.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoginView = true;
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbKwLSbJs4HOlLdFk-LKBm9iIOxY16fmusxlhmaV7fxD9ZqooliykKrQ72l6THaYYX/exec"; 
+        let cachedAllLeaves = [];
+        let cachedEmployeeLeaves = [];
+        let isEditMode = false;
+        let editingRequestId = "";
+        let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = sessionStorage.getItem('currentUser');
+            const savedPass = sessionStorage.getItem('currentPass');
+            if (savedUser && savedPass) {
+                const userObj = JSON.parse(savedUser);
+                silentFetchData(userObj.code, savedPass);
+            }
+        });
+
+        function syncEndDateMin() {
+            const startDate = document.getElementById('leave-start').value;
+            const endDateInput = document.getElementById('leave-end');
+            if (startDate) {
+                endDateInput.min = startDate;
+                if (endDateInput.value && endDateInput.value < startDate) {
+                    endDateInput.value = startDate;
+                }
+            }
+        }
+
+        function toggleForm() {
+            const loginPanel = document.getElementById('login-panel'); const registerPanel = document.getElementById('register-panel');
+            const toggleBtn = document.getElementById('toggle-btn'); const welcomeTitle = document.getElementById('welcome-title'); const welcomeDesc = document.getElementById('welcome-desc');
+            if (isLoginView) {
+                loginPanel.classList.remove('active'); registerPanel.classList.add('active');
+                welcomeTitle.innerText = "لديك حساب بالفعل؟"; welcomeDesc.innerText = "عد لتسجيل الدخول مباشرة لمتابعة نظامك."; toggleBtn.innerText = "تسجيل الدخول"; isLoginView = false;
+            } else {
+                registerPanel.classList.remove('active'); loginPanel.classList.add('active');
+                welcomeTitle.innerText = "مرحباً بك!"; welcomeDesc.innerText = "نظام تقديم ومتابعة الإجازات الإلكتروني التفاعلي."; toggleBtn.innerText = "إنشاء حساب"; isLoginView = true;
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const code = document.getElementById('reg-code').value.trim();
+            const password = document.getElementById('reg-pass').value.trim();
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.innerText = "جاري الحفظ والتحقق..."; submitBtn.disabled = true;
+
+            fetch(`${SCRIPT_URL}?action=register&code=${encodeURIComponent(code)}&password=${encodeURIComponent(password)}`)
+            .then(res => res.json()).then(data => { alert(data.message); if (data.status === "success") { e.target.reset(); toggleForm(); } })
+            .catch(() => alert("عفواً، تأكد من اتصال الشبكة وصلاحية الكود في الشيت."))
+            .finally(() => { submitBtn.innerText = "إنشاء الحساب"; submitBtn.disabled = false; });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const code = document.getElementById('login-code').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.innerText = "جاري الدخول..."; submitBtn.disabled = true;
+
+            fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}&password=${encodeURIComponent(password)}`)
+            .then(res => res.json()).then(data => {
+                if (data.status === "success") {
+                    sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+                    sessionStorage.setItem('currentPass', password);
+                    updateDashboardUI(data);
+                } else { alert(data.message); }
+            })
+            .catch(() => alert("خطأ في الاتصال بالسيرفر الرئيسي."))
+            .finally(() => { submitBtn.innerText = "دخول"; submitBtn.disabled = false; });
+        }
+
+        function updateDashboardUI(data) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'flex';
+            document.getElementById('db-user-name').innerText = data.user.name;
+            document.getElementById('db-user-dept-role').innerText = `${data.user.department} - (${data.user.role})`;
+
+            const empLayout = document.getElementById('employee-layout');
+            const mgrLayout = document.getElementById('manager-layout');
+            const badge = document.getElementById('main-bell-badge');
+
+            if (data.user.role === "مدير") {
+                mgrLayout.style.display = 'flex';   
+                empLayout.style.display = 'none';   
+                renderManagerTable(data.managerPending);
+                
+                cachedAllLeaves = data.allLeaves || [];
+                filterHistoryByMonth(); 
+
+                let pendingCount = data.managerPending ? data.managerPending.length : 0;
+                if (pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.style.display = "flex";
+                } else {
+                    badge.style.display = "none";
+                }
+            } else {
+                empLayout.style.display = 'flex';   
+                mgrLayout.style.display = 'none';   
+                document.getElementById('lbl-annual').innerText = `${data.user.annualBalance} يوم`;
+                document.getElementById('lbl-casual').innerText = `${data.user.casualBalance} يوم`;
+                document.getElementById('lbl-holiday').innerText = `${data.user.holidayBalance} يوم`;
+                
+                cachedEmployeeLeaves = data.myLeaves || [];
+                filterEmployeeLeavesByMonth();
+
+                let currentProcessed = cachedEmployeeLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض').length;
+                if (currentProcessed > lastApprovedCount && lastApprovedCount !== 0) {
+                    badge.innerText = "!"; 
+                    badge.style.display = "flex";
+                } else {
+                    badge.style.display = "none";
+                }
+                localStorage.setItem('lastAppCount', currentProcessed);
+            }
+        }
+
+        function clearNotificationBadge() {
+            document.getElementById('main-bell-badge').style.display = "none";
+        }
+
+        function refreshDashboardData() {
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            const pass = sessionStorage.getItem('currentPass');
+            if(user && pass) {
+                silentFetchData(user.code, pass);
+            }
+        }
+
+        function silentFetchData(code, pass) {
+            fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}&password=${encodeURIComponent(pass)}`)
+            .then(res => res.json()).then(data => {
+                if (data.status === "success") {
+                    sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+                    updateDashboardUI(data);
+                }
+            }).catch(err => console.log("خطأ أثناء تحديث البيانات بالخلفية:", err));
+        }
+
+        function filterEmployeeLeavesByMonth() {
+            const selectedMonth = document.getElementById('emp-month-filter').value;
+            const tbody = document.getElementById('employee-table-body');
+            
+            let filtered = cachedEmployeeLeaves;
+            if (selectedMonth !== "all") {
+                filtered = filtered.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
+            }
+            
+            if(!filtered || filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #999;">لا توجد طلبات إجازات متوافقة مع هذا الشهر.</td></tr>`; return;
+            }
+            
+            tbody.innerHTML = filtered.map(l => {
+                let badgeClass = l.status === 'قيد الانتظار' ? 'pending' : (l.status === 'مقبول' ? 'approved' : 'rejected');
+                
+                // ✏️ زر التعديل و 🗑️ زر الحذف والإلغاء يظهران معاً للطلبات المعلقة فقط
+                let editAction = "";
+                if (l.status === 'قيد الانتظار') {
+                    editAction = `
+                        <button class="btn-action edit-btn" title="تعديل هذا الطلب" onclick="activateRequestEdit('${l.id}', '${l.type}', '${l.start}', '${l.end}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action delete-btn" title="إلغاء وسحب هذا الطلب نهائياً" onclick="handleDeleteLeave('${l.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                    `;
+                }
+
+                return `<tr>
+                    <td>${l.id} ${editAction}</td>
+                    <td>${l.type}</td>
+                    <td>من ${l.start.split('T')[0]} إلى ${l.end.split('T')[0]}</td>
+                    <td>${l.days} أيام</td>
+                    <td><span class="badge ${badgeClass}">${l.status}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 🗑️ دالة جافا سكريبت لإرسال طلب الإلغاء الفوري للسيرفر
+        function handleDeleteLeave(requestId) {
+            if (!confirm(`هل أنت متأكد من إلغاء وسحب طلب الإجازة (${requestId}) نهائياً من السيستم؟`)) return;
+            
+            // تحويل مؤقت لحالة الزرار لشعور تفاعلي بالسرعة
+            const url = `${SCRIPT_URL}?action=deleteLeave&requestId=${requestId}`;
+            
+            fetch(url).then(res => res.json()).then(data => {
+                alert(data.message);
+                if (isEditMode && editingRequestId === requestId) {
+                    cancelEditMode(); // لو كان فاتح نفس الطلب للتعديل يقفله
+                }
+                refreshDashboardData(); // تحديث فوري وشامل صامت بالخلفية للرصيد والجدول
+            })
+            .catch(() => alert("حدث خطأ أثناء محاولة إلغاء الطلب من السيرفر."));
+        }
+
+        function activateRequestEdit(id, type, start, end) {
+            isEditMode = true;
+            editingRequestId = id;
+            
+            document.getElementById('form-action-title').innerText = `تعديل طلب الإجازة (${id}) ✏️`;
+            document.getElementById('btn-submit-text').innerText = "تحديث وحفظ الطلب الآن";
+            document.getElementById('btn-cancel-edit').style.display = "block";
+            
+            document.getElementById('leave-type').value = type;
+            document.getElementById('leave-start').value = start.split('T')[0];
+            document.getElementById('leave-end').value = end.split('T')[0];
+            
+            syncEndDateMin();
+            document.getElementById('form-action-title').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEditMode() {
+            isEditMode = false;
+            editingRequestId = "";
+            document.getElementById('leave-form').reset();
+            document.getElementById('leave-end').removeAttribute('min'); 
+            document.getElementById('form-action-title').innerText = "طلب إجازة جديد";
+            document.getElementById('btn-submit-text').innerText = "إرسال الطلب";
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        function renderManagerTable(pendingLeaves) {
+            const tbody = document.getElementById('manager-table-body');
+            if(!pendingLeaves || pendingLeaves.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">ممتاز! لا توجد طلبات معلقة بانتظار الاعتماد.</td></tr>`; return;
+            }
+            tbody.innerHTML = pendingLeaves.map(l => `
+                <tr>
+                    <td>${l.id}</td>
+                    <td>${l.name} (${l.code})</td>
+                    <td>${l.type}</td>
+                    <td>${l.days} يوم</td>
+                    <td>
+                        <button class="btn-action approve" onclick="processLeave('${l.id}', 'مقبول')">✅ موافق</button>
+                        <button class="btn-action reject" onclick="processLeave('${l.id}', 'مرفوض')">❌ رفض</button>
+                    </td>
+                </tr>
+            `);
+        }
+
+        function filterHistoryByMonth() {
+            const selectedMonth = document.getElementById('month-filter').value;
+            const searchCode = document.getElementById('search-emp-code').value.trim().toLowerCase();
+            const tbody = document.getElementById('manager-history-table-body');
+            
+            let approvedLeaves = cachedAllLeaves.filter(l => l.status === 'مقبول');
+            let filteredTable = cachedAllLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض');
+            
+            if (selectedMonth !== "all") {
+                approvedLeaves = approvedLeaves.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
+                filteredTable = filteredTable.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
+            }
+            
+            if (searchCode !== "") {
+                approvedLeaves = approvedLeaves.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
+                filteredTable = filteredTable.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
+            }
+            
+            let totalAnnual = 0;
+            let totalCasual = 0;
+            let totalHoliday = 0;
+
+            approvedLeaves.forEach(l => {
+                const days = parseInt(l.days) || 0;
+                if (l.type === "اعتيادي") totalAnnual += days;
+                else if (l.type === "عارضة") totalCasual += days;
+                else if (l.type === "بدل أعياد") totalHoliday += days;
+            });
+
+            document.getElementById('mgr-total-annual').innerText = `${totalAnnual} يوم`;
+            document.getElementById('mgr-total-casual').innerText = `${totalCasual} يوم`;
+            document.getElementById('mgr-total-holiday').innerText = `${totalHoliday} يوم`;
+            
+            const targetRecord = approvedLeaves.find(l => l.code && l.code.toLowerCase() === searchCode);
+            
+            if(searchCode !== "" && targetRecord) {
+                document.getElementById('mgr-rem-annual').innerText = targetRecord.annualBalance !== undefined ? `${targetRecord.annualBalance} يوم` : "متاح";
+                document.getElementById('mgr-rem-casual').innerText = targetRecord.casualBalance !== undefined ? `${targetRecord.casualBalance} يوم` : "متاح";
+                document.getElementById('mgr-rem-holiday').innerText = targetRecord.holidayBalance !== undefined ? `${targetRecord.holidayBalance} يوم` : "متاح";
+            } else {
+                document.getElementById('mgr-rem-annual').innerText = "--";
+                document.getElementById('mgr-rem-casual').innerText = "--";
+                document.getElementById('mgr-rem-holiday').innerText = "--";
+            }
+            
+            if(filteredTable.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
+            }
+            
+            tbody.innerHTML = filteredTable.map(l => {
+                let badgeClass = l.status === 'مقبول' ? 'approved' : 'rejected';
+                return `
+                    <tr>
+                        <td>${l.id}</td>
+                        <td>${l.name || 'موظف'} (${l.code})</td>
+                        <td>${l.type}</td>
+                        <td>${l.days} يوم</td>
+                        <td><span class="badge ${badgeClass}">${l.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleLeaveSubmit(e) {
+            e.preventDefault();
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            const type = document.getElementById('leave-type').value;
+            const start = document.getElementById('leave-start').value;
+            const end = document.getElementById('leave-end').value;
+            
+            if(!start || !end) return;
+
+            if (end < start) {
+                alert("عفواً يا فنان، لا يمكن أن يكون تاريخ نهاية الإجازة قبل تاريخ بدايتها! رجاءً راجع الحقول.");
+                return;
+            }
+
+            const diffTime = Math.abs(new Date(end) - new Date(start));
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            const submitBtn = document.getElementById('btn-submit-text');
+            submitBtn.disabled = true;
+
+            let url = "";
+            if (isEditMode) {
+              submitBtn.innerText = "جاري تحديث طلبك...";
+              url = `${SCRIPT_URL}?action=updateLeave&requestId=${editingRequestId}&type=${encodeURIComponent(type)}&start=${start}&end=${end}&days=${diffDays}`;
+            } else {
+              submitBtn.innerText = "جاري إرسال طلبك...";
+              url = `${SCRIPT_URL}?action=submitLeave&code=${user.code}&name=${encodeURIComponent(user.name)}&type=${encodeURIComponent(type)}&start=${start}&end=${end}&days=${diffDays}`;
+            }
+
+            fetch(url).then(res => res.json()).then(data => { 
+                alert(data.message); 
+                cancelEditMode(); 
+                refreshDashboardData(); 
+            })
+            .catch(() => alert("حدثت مشكلة أثناء معالجة طلبك بالسيرفر."))
+            .finally(() => submitBtn.disabled = false);
+        }
+
+        function processLeave(requestId, decision) {
+            if(!confirm(`هل أنت متأكد من تسجيل قرارك بـ (${decision})؟`)) return;
+            fetch(`${SCRIPT_URL}?action=processLeave&requestId=${requestId}&decision=${encodeURIComponent(decision)}`)
+            .then(res => res.json()).then(data => { 
+                alert(data.message); 
+                refreshDashboardData(); 
+            });
+        }
+
+        function handleUpdateHoliday(e) {
+            e.preventDefault();
+            const targetCode = document.getElementById('target-emp-code').value.trim();
+            const newBalance = document.getElementById('new-holiday-balance').value.trim();
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.innerText = "جاري حفظ التعديل..."; submitBtn.disabled = true;
+            
+            fetch(`${SCRIPT_URL}?action=updateHolidayBalance&targetCode=${encodeURIComponent(targetCode)}&newBalance=${encodeURIComponent(newBalance)}`)
+            .then(res => res.json()).then(data => { 
+                alert(data.message); 
+                if(data.status === "success") {
+                    e.target.reset(); 
+                    refreshDashboardData();
+                }
+            })
+            .catch(() => alert("خطأ في الاتصال بالسيرفر وتحديث الرصيد."))
+            .finally(() => { submitBtn.innerText = "تحديث الرصيد الآن"; submitBtn.disabled = false; });
+        }
+
+        function handleLogout() { 
+            sessionStorage.removeItem('currentUser'); 
+            sessionStorage.removeItem('currentPass');
+            location.reload(); 
+        }
+    </script>
+</body>
+</html>
