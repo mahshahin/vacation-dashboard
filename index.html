@@ -630,10 +630,17 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         }
 
-        function clearNotificationBadge() {
-            document.getElementById('main-bell-badge').style.display = "none";
-            document.getElementById('main-bell-badge').innerText = "0";
-        }
+     function clearNotificationBadge() {
+    document.getElementById('main-bell-badge').style.display = "none";
+    document.getElementById('main-bell-badge').innerText = "0";
+
+    // 👑 الجزء الخاص بالموظف فقط: قفل التنبيه في الكاش عشان ميرجعش ينور تاني
+    if (typeof cachedEmployeeLeaves !== 'undefined' && cachedEmployeeLeaves && cachedEmployeeLeaves.length > 0) {
+        let currentProcessed = cachedEmployeeLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض').length;
+        lastApprovedCount = currentProcessed;
+        localStorage.setItem('lastAppCount', currentProcessed);
+    }
+}
 
         function refreshDashboardData() {
             const user = JSON.parse(sessionStorage.getItem('currentUser'));
