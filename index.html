@@ -19,8 +19,9 @@
             padding: 20px;
         }
         
-        /* ==================== 🚪 شاشة تسجيل الدخول المتجاوبة ==================== */
-        .login-screen { display: flex; justify-content: center; align-items: center; width: 100%; }
+        /* 🌟 جعل الحالات الابتدائية مخفية تماماً لمنع الرمشة والخروج التلقائي عند الريفريش */
+        .login-screen { display: none; justify-content: center; align-items: center; width: 100%; }
+        .dashboard-screen { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
         
         .login-container {
             background-color: #ffffff; width: 900px; max-width: 100%; min-height: 500px;
@@ -62,9 +63,6 @@
         }
         .btn-main:hover { background-color: #4e6edb; }
 
-        /* ==================== 📊 شاشة الداشبورد الشاملة المتجاوبة ==================== */
-        .dashboard-screen { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
-        
         .dashboard-header { 
             background-color: #ffffff; padding: 20px 30px; border-radius: 18px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 20px; position: relative; 
@@ -97,7 +95,6 @@
 
         .employee-layout, .manager-layout { display: none; flex-direction: column; gap: 20px; width: 100%; }
         
-        /* شبكة الأرصدة الكومبيوتر */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
         .stat-card { background-color: #ffffff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); display: flex; align-items: center; gap: 15px; }
         .stat-card .icon { width: 46px; height: 46px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
@@ -114,14 +111,12 @@
         .balance-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 4px; font-size: 13px; color: #334155; }
         .balance-row span.remaining { color: #10b981; font-weight: 700; }
 
-        /* تقسيم الكومبيوتر المتوازن (الصندوق صغير وبجانب السجل العريض) */
         .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; }
         .manager-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; align-items: start; } 
         
         .content-box { background-color: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
         .content-box h3 { font-size: 16px; color: #333; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; }
 
-        /* ترويسة صندوق السجل */
         .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; margin-bottom: 20px; }
         .history-header h3 { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .filters-container { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
@@ -145,7 +140,7 @@
         .btn-action.approve { background-color: #f0fdf4; color: #16a34a; }
         .btn-action.reject { background-color: #fef2f2; color: #dc2626; }
         .btn-action.edit-btn { background-color: #e0e8f6; color: #4e6edb; } 
-        .btn-action.delete-btn { background-color: #fdf2f2; color: #ef4444; } /* ستايل زر سلة المهملات الجذاب للإلغاء */
+        .btn-action.delete-btn { background-color: #fdf2f2; color: #ef4444; }
 
         /* ==================== 📱 قـواعد الـ Media Queries للموبايل ==================== */
         @media (max-width: 768px) {
@@ -156,8 +151,6 @@
             .form-area { width: 100%; padding: 30px 20px; min-height: auto; }
             
             .dashboard-screen { gap: 16px; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; } 
-            
-            /* تحويل الـ Grids لـ Block على الموبايل لتنزل العناصر تحت بعضها بالتوازي التام وبدون أي تداخل */
             .main-grid, .manager-grid { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
             
             .dashboard-header { flex-direction: column; text-align: center; padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px; box-sizing: border-box !important; }
@@ -167,13 +160,8 @@
             .stats-grid { grid-template-columns: 1fr; gap: 12px; width: 100% !important; margin: 0 0 16px 0 !important; padding: 0 !important; box-sizing: border-box !important; }
             .stat-card { padding: 16px !important; width: 100% !important; margin: 0 !important; border-radius: 14px; box-sizing: border-box !important; } 
             
-            /* حشو الصناديق المتساوي على الموبايل لضبط خط المحاذاة الشامل */
             .content-box { 
-                padding: 16px !important; 
-                width: 100% !important; 
-                margin: 0 0 16px 0 !important; 
-                border-radius: 14px !important; 
-                box-sizing: border-box !important; 
+                padding: 16px !important; width: 100% !important; margin: 0 0 16px 0 !important; border-radius: 14px !important; box-sizing: border-box !important; 
             } 
             
             .content-box form { width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
@@ -394,11 +382,11 @@
                     <table>
                         <thead>
                             <tr>
-                                    <th>الطلب</th>
-                                    <th>الموظف</th>
-                                    <th>نوع الإجازة</th>
-                                    <th>الأيام</th>
-                                    <th>الحالة النهائية</th>
+                                <th>الطلب</th>
+                                <th>الموظف</th>
+                                <th>نوع الإجازة</th>
+                                <th>الأيام</th>
+                                <th>الحالة النهائية</th>
                             </tr>
                         </thead>
                         <tbody id="manager-history-table-body">
@@ -412,6 +400,7 @@
 
     <script>
         let isLoginView = true;
+        <!-- 🌟 الرابط الرئيسي للتعامل مع جميع طلبات التسجيل، الدخول، إدارة الإجازات، والبيانات -->
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbKwLSbJs4HOlLdFk-LKBm9iIOxY16fmusxlhmaV7fxD9ZqooliykKrQ72l6THaYYX/exec"; 
         let cachedAllLeaves = [];
         let cachedEmployeeLeaves = [];
@@ -419,12 +408,16 @@
         let editingRequestId = "";
         let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
 
+        // 🌟 فحص الكاش الفوري عند تحميل الـ DOM لاتخاذ القرار صامتاً قبل أي رندر مرئي للشاشات
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('currentUser');
             const savedPass = sessionStorage.getItem('currentPass');
             if (savedUser && savedPass) {
                 const userObj = JSON.parse(savedUser);
                 silentFetchData(userObj.code, savedPass);
+            } else {
+                // لو مفيش كاش يفتح صفحة اللوجن صامتة وبدون رمش
+                document.getElementById('login-screen').style.display = 'flex';
             }
         });
 
@@ -484,6 +477,7 @@
         }
 
         function updateDashboardUI(data) {
+            // إخفاء شاشة اللوجن تماماً وإظهار الداشبورد
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('dashboard-screen').style.display = 'flex';
             document.getElementById('db-user-name').innerText = data.user.name;
@@ -548,7 +542,11 @@
                     sessionStorage.setItem('currentUser', JSON.stringify(data.user));
                     updateDashboardUI(data);
                 }
-            }).catch(err => console.log("خطأ أثناء تحديث البيانات بالخلفية:", err));
+            }).catch(err => {
+                console.log("خطأ أثناء تحديث البيانات بالخلفية:", err);
+                // في حالة فشل التحديث الصامت لسبب طارئ، نؤمن العرض بفتح اللوجن
+                document.getElementById('login-screen').style.display = 'flex';
+            });
         }
 
         function filterEmployeeLeavesByMonth() {
@@ -566,8 +564,6 @@
             
             tbody.innerHTML = filtered.map(l => {
                 let badgeClass = l.status === 'قيد الانتظار' ? 'pending' : (l.status === 'مقبول' ? 'approved' : 'rejected');
-                
-                // ✏️ زر التعديل و 🗑️ زر الحذف والإلغاء يظهران معاً للطلبات المعلقة فقط
                 let editAction = "";
                 if (l.status === 'قيد الانتظار') {
                     editAction = `
@@ -586,19 +582,15 @@
             }).join('');
         }
 
-        // 🗑️ دالة جافا سكريبت لإرسال طلب الإلغاء الفوري للسيرفر
         function handleDeleteLeave(requestId) {
             if (!confirm(`هل أنت متأكد من إلغاء وسحب طلب الإجازة (${requestId}) نهائياً من السيستم؟`)) return;
-            
-            // تحويل مؤقت لحالة الزرار لشعور تفاعلي بالسرعة
             const url = `${SCRIPT_URL}?action=deleteLeave&requestId=${requestId}`;
-            
             fetch(url).then(res => res.json()).then(data => {
                 alert(data.message);
                 if (isEditMode && editingRequestId === requestId) {
-                    cancelEditMode(); // لو كان فاتح نفس الطلب للتعديل يقفله
+                    cancelEditMode();
                 }
-                refreshDashboardData(); // تحديث فوري وشامل صامت بالخلفية للرصيد والجدول
+                refreshDashboardData();
             })
             .catch(() => alert("حدث خطأ أثناء محاولة إلغاء الطلب من السيرفر."));
         }
