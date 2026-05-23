@@ -579,14 +579,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedEmployeeLeaves = data.myLeaves || [];
                 filterEmployeeLeavesByMonth();
 
+                // 🔔 تشغيل النوتفيكشن باللون الأحمر لو المدير وافق أو رفض على طلب جديد
                 let currentProcessed = cachedEmployeeLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض').length;
+                
                 if (currentProcessed > lastApprovedCount && lastApprovedCount !== 0) {
                     badge.innerText = "!"; 
-                    badge.style.display = "flex";
+                    badge.style.display = "flex"; // تظهر النقطة الحمراء فوراً
                 } else {
-                    if (badge.innerText !== "!") badge.style.display = "none";
+                    if (badge.innerText !== "!") {
+                        badge.style.display = "none";
+                    }
                 }
-                localStorage.setItem('lastAppCount', currentProcessed);
+                
+                if (lastApprovedCount === 0) {
+                    lastApprovedCount = currentProcessed;
+                }
             }
         }
 
