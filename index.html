@@ -119,7 +119,7 @@
         .content-box { background-color: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
         .content-box h3 { font-size: 16px; color: #333; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #f0f2f7; padding-bottom: 10px; }
 
-        /* 🛠️ هندسة ترويسة صندوق السجل لمنع اختفاء أو سقوط فلاتر المدير والموظف */
+        /* هندسة ترويسة صندوق السجل والمحافظة على الفلاتر الكبرى */
         .history-header { 
             display: flex; 
             justify-content: space-between; 
@@ -127,7 +127,7 @@
             border-bottom: 2px solid #f0f2f7; 
             padding-bottom: 10px; 
             margin-bottom: 20px; 
-            flex-wrap: wrap; /* تسمح بمرونة التوزيع لمنع كسر المحاذاة */
+            flex-wrap: wrap; 
             gap: 15px;
         }
         .history-header h3 { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -135,13 +135,13 @@
         .filters-container { 
             display: flex; 
             align-items: center; 
-            gap: 15px; 
+            gap: 12px; 
             flex-wrap: wrap; 
         }
-        .filter-group { display: flex; align-items: center; gap: 8px; }
-        .filter-group label { font-size: 13px; color: #64748b; font-weight: 600; white-space: nowrap; }
-        .filter-group select, .filter-group input { padding: 6px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; background-color: #f8fafc; font-family: 'Cairo', sans-serif; }
-        .filter-group input { width: 140px; }
+        .filter-group { display: flex; align-items: center; gap: 6px; }
+        .filter-group label { font-size: 12px; color: #64748b; font-weight: 600; white-space: nowrap; }
+        .filter-group select, .filter-group input { padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; background-color: #f8fafc; font-family: 'Cairo', sans-serif; }
+        .filter-group input { width: 120px; }
         .filter-group input:focus { border-color: #6584f1; background-color: #ffffff; }
 
         .table-wrapper { overflow-x: auto; width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; }
@@ -356,7 +356,33 @@
                 </div>
 
                 <div class="content-box">
-                    <h3>طلبات الإجازات بانتظار الاعتماد</h3>
+                    <div class="history-header">
+                        <h3>طلبات بانتظار الاعتماد</h3>
+                        <div class="filters-container">
+                            <div class="filter-group">
+                                <label for="pending-emp-code"><i class="fa-solid fa-magnifying-glass"></i> كود الموظف:</label>
+                                <input type="text" id="pending-emp-code" placeholder="بحث موظف..." oninput="filterManagerPendingTable()">
+                            </div>
+                            <div class="filter-group">
+                                <label for="pending-month-filter">الشهر:</label>
+                                <select id="pending-month-filter" onchange="filterManagerPendingTable()">
+                                    <option value="all">كل الشهور</option>
+                                    <option value="01">يناير (01)</option>
+                                    <option value="02">فبراير (02)</option>
+                                    <option value="03">مارس (03)</option>
+                                    <option value="04">أبريل (04)</option>
+                                    <option value="05">مايو (05)</option>
+                                    <option value="06">يونيو (06)</option>
+                                    <option value="07">يوليو (07)</option>
+                                    <option value="08">أغسطس (08)</option>
+                                    <option value="09">سبتمبر (09)</option>
+                                    <option value="10">أكتوبر (10)</option>
+                                    <option value="11">نوفمبر (11)</option>
+                                    <option value="12">ديسمبر (12)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-wrapper">
                         <table>
                             <thead><tr><th>الطلب</th><th>الموظف</th><th>النوع</th><th>الأيام</th><th>القرار الإداري</th></tr></thead>
@@ -418,10 +444,10 @@
 
     <script>
         let isLoginView = true;
-        <!-- رابط السكريبت الخاص بجوجل شيت والذي يحتوي على جميع الوظائف البرمجية للتعامل مع البيانات -->
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbKwLSbJs4HOlLdFk-LKBm9iIOxY16fmusxlhmaV7fxD9ZqooliykKrQ72l6THaYYX/exec"; 
         let cachedAllLeaves = [];
         let cachedEmployeeLeaves = [];
+        let cachedManagerPending = []; // مصفوفة لحفظ الطلبات المعلقة محلياً لفلترتها فوراً
         let isEditMode = false;
         let editingRequestId = "";
         let lastApprovedCount = parseInt(localStorage.getItem('lastAppCount') || "0");
@@ -505,12 +531,14 @@
             if (data.user.role === "مدير") {
                 mgrLayout.style.display = 'flex';   
                 empLayout.style.display = 'none';   
-                renderManagerTable(data.managerPending);
+                
+                cachedManagerPending = data.managerPending || [];
+                filterManagerPendingTable(); // رندر فوري للجدول المعلق
                 
                 cachedAllLeaves = data.allLeaves || [];
                 filterHistoryByMonth(); 
 
-                let pendingCount = data.managerPending ? data.managerPending.length : 0;
+                let pendingCount = cachedManagerPending.length;
                 if (pendingCount > 0) {
                     badge.innerText = pendingCount;
                     badge.style.display = "flex";
@@ -536,6 +564,39 @@
                 }
                 localStorage.setItem('lastAppCount', currentProcessed);
             }
+        }
+
+        // 🆕 دالة الفلترة الذكية لجدول الطلبات المعلقة (بانتظار الاعتماد) عند المدير
+        function filterManagerPendingTable() {
+            const searchCode = document.getElementById('pending-emp-code').value.trim().toLowerCase();
+            const selectedMonth = document.getElementById('pending-month-filter').value;
+            const tbody = document.getElementById('manager-table-body');
+            
+            let filtered = cachedManagerPending;
+            
+            if (searchCode !== "") {
+                filtered = filtered.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
+            }
+            if (selectedMonth !== "all") {
+                filtered = filtered.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
+            }
+            
+            if(!filtered || filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات معلقة متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
+            }
+            
+            tbody.innerHTML = filtered.map(l => `
+                <tr>
+                    <td>${l.id}</td>
+                    <td>${l.name} (${l.code})</td>
+                    <td>${l.type}</td>
+                    <td>${l.days} يوم</td>
+                    <td>
+                        <button class="btn-action approve" onclick="processLeave('${l.id}', 'مقبول')">✅ موافق</button>
+                        <button class="btn-action reject" onclick="processLeave('${l.id}', 'مرفوض')">❌ رفض</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function clearNotificationBadge() {
@@ -633,25 +694,6 @@
             document.getElementById('form-action-title').innerText = "طلب إجازة جديد";
             document.getElementById('btn-submit-text').innerText = "إرسال الطلب";
             document.getElementById('btn-cancel-edit').style.display = "none";
-        }
-
-        function renderManagerTable(pendingLeaves) {
-            const tbody = document.getElementById('manager-table-body');
-            if(!pendingLeaves || pendingLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">ممتاز! لا توجد طلبات معلقة بانتظار الاعتماد.</td></tr>`; return;
-            }
-            tbody.innerHTML = pendingLeaves.map(l => `
-                <tr>
-                    <td>${l.id}</td>
-                    <td>${l.name} (${l.code})</td>
-                    <td>${l.type}</td>
-                    <td>${l.days} يوم</td>
-                    <td>
-                        <button class="btn-action approve" onclick="processLeave('${l.id}', 'مقبول')">✅ موافق</button>
-                        <button class="btn-action reject" onclick="processLeave('${l.id}', 'مرفوض')">❌ رفض</button>
-                    </td>
-                </tr>
-            `);
         }
 
         function filterHistoryByMonth() {
