@@ -127,13 +127,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.user.role === "مدير") {
                 mgrLayout.style.display = 'flex';   
-                empLayout.style.display = 'none';   
+                empLayout.style.display = 'none';
+                
+                fetchAllEmployeesFromSheet();
                 
                 cachedManagerPending = data.managerPending || [];
                 filterManagerPendingTable(); 
                 
                 cachedAllLeaves = data.allLeaves || [];
-                filterHistoryByMonth(); 
+                filterHistoryByMonth();
+                
+                populateEmpDatalist(); // تشغيل القائمة الذكية فور تحميل البيانات
 
                 let pendingCount = cachedManagerPending.length;
                 if (pendingCount > 0) {
@@ -308,68 +312,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function filterHistoryByMonth() {
-            const selectedMonth = document.getElementById('month-filter').value;
-            const searchCode = document.getElementById('search-emp-code').value.trim().toLowerCase();
-            const tbody = document.getElementById('manager-history-table-body');
-            
-            let approvedLeaves = cachedAllLeaves.filter(l => l.status === 'مقبول');
-            let filteredTable = cachedAllLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض');
-            
-            if (selectedMonth !== "all") {
-                approvedLeaves = approvedLeaves.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
-                filteredTable = filteredTable.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
-            }
-            
-            if (searchCode !== "") {
-                approvedLeaves = approvedLeaves.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
-                filteredTable = filteredTable.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
-            }
-            
-            let totalAnnual = 0;
-            let totalCasual = 0;
-            let totalHoliday = 0;
-
-            approvedLeaves.forEach(l => {
-                const days = parseInt(l.days) || 0;
-                if (l.type === "اعتيادي") totalAnnual += days;
-                else if (l.type === "عارضة") totalCasual += days;
-                else if (l.type === "بدل أعياد") totalHoliday += days;
-            });
-
-            document.getElementById('mgr-total-annual').innerText = `${totalAnnual} يوم`;
-            document.getElementById('mgr-total-casual').innerText = `${totalCasual} يوم`;
-            document.getElementById('mgr-total-holiday').innerText = `${totalHoliday} يوم`;
-            
-            const targetRecord = approvedLeaves.find(l => l.code && l.code.toLowerCase() === searchCode);
-            
-            if(searchCode !== "" && targetRecord) {
-                document.getElementById('mgr-rem-annual').innerText = targetRecord.annualBalance !== undefined ? `${targetRecord.annualBalance} يوم` : "متاح";
-                document.getElementById('mgr-rem-casual').innerText = targetRecord.casualBalance !== undefined ? `${targetRecord.casualBalance} يوم` : "متاح";
-                document.getElementById('mgr-rem-holiday').innerText = targetRecord.holidayBalance !== undefined ? `${targetRecord.holidayBalance} يوم` : "متاح";
-            } else {
-                document.getElementById('mgr-rem-annual').innerText = "--";
-                document.getElementById('mgr-rem-casual').innerText = "--";
-                document.getElementById('mgr-rem-holiday').innerText = "--";
-            }
-            
-            if(filteredTable.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
-            }
-            
-            tbody.innerHTML = filteredTable.map(l => {
-                let badgeClass = l.status === 'مقبول' ? 'approved' : 'rejected';
-                return `
-                    <tr>
-                        <td>${l.id}</td>
-                        <td>${l.name || 'موظف'} (${l.code})</td>
-                        <td>${l.type}</td>
-                        <td>من ${l.start.split('T')[0]} إلى ${l.end.split('T')[0]}</td>
-                        <td>${l.days} يوم</td>
-                        <td><span class="badge ${badgeClass}">${l.status}</span></td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    const selectedMonth = document.getElementById('month-filter').value;
+    const searchCode = document.getElementById('search-emp-code').value.trim().toLowerCase();
+    const tbody = document.getElementById('manager-history-table-body');
+    
+    let filteredTable = cachedAllLeaves.filter(l => l.status === 'مقبول' || l.status === 'مرفوض');
+    
+    if (selectedMonth !== "all") {
+        filteredTable = filteredTable.filter(l => l.start && l.start.split('-')[1] === selectedMonth);
+    }
+    
+    if (searchCode !== "") {
+        filteredTable = filteredTable.filter(l => l.code && l.code.toLowerCase().includes(searchCode));
+    }
+    
+    // 👑 محمود: شيلنا من هنا الجزء اللي كان بيجمع ويكتب الإجمالي العام في الكروت فوق 👑
+    
+    if(filteredTable.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#999;">لا توجد طلبات متوافقة مع اختيارات البحث الحالية.</td></tr>`; return;
+    }
+    
+    tbody.innerHTML = filteredTable.map(l => {
+        let badgeClass = l.status === 'مقبول' ? 'approved' : 'rejected';
+        return `
+            <tr>
+                <td>${l.id}</td>
+                <td>${l.name || 'موظف'} (${l.code})</td>
+                <td>${l.type}</td>
+                <td>من ${l.start.split('T')[0]} إلى ${l.end.split('T')[0]}</td>
+                <td>${l.days} يوم</td>
+                <td><span class="badge ${badgeClass}">${l.status}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
 
         function handleLeaveSubmit(e) {
             e.preventDefault();
@@ -439,25 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        function handleUpdateHoliday(e) {
-            e.preventDefault();
-            const targetCode = document.getElementById('target-emp-code').value.trim();
-            const newBalance = document.getElementById('new-holiday-balance').value.trim();
-            const submitBtn = e.target.querySelector('button');
-            submitBtn.innerText = "جاري حفظ التعديل..."; submitBtn.disabled = true;
-            
-            fetch(`${SCRIPT_URL}?action=updateHolidayBalance&targetCode=${encodeURIComponent(targetCode)}&newBalance=${encodeURIComponent(newBalance)}`)
-            .then(res => res.json()).then(data => { 
-                alert(data.message); 
-                if(data.status === "success") {
-                    e.target.reset(); 
-                    document.getElementById('emp-name-preview').style.display = "none"; // إخفاء شريط الاسم بعد الحفظ
-                    refreshDashboardData();
-                }
-            })
-            .catch(() => alert("خطأ في الاتصال بالسيرفر وتحديث الرصيد."))
-            .finally(() => { submitBtn.innerText = "تحديث الرصيد الآن"; submitBtn.disabled = false; });
-        }
+    
 
         function handleLogout() { 
             if (liveSyncTimer) clearInterval(liveSyncTimer); 
@@ -465,25 +423,151 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.removeItem('currentPass');
             location.reload(); 
         }
-        // 👑 دالة قراءة الكود وإظهار اسم الموظف آلياً في شريط النص تحت الخانة للمدير
-function showEmpNameLocally() {
-    const codeInput = document.getElementById('target-emp-code').value.trim().toLowerCase();
-    const previewBar = document.getElementById('emp-name-preview');
-    const nameLabel = document.getElementById('lbl-preview-name');
+        
+        // 👑 دالة مطورة لملء القائمة الذكية بقراءة البيانات من جدول الشيت مباشرة
+function populateEmpDatalist() {
+    const datalist = document.getElementById('emp-list');
+    if (!datalist) return;
+
+    datalist.innerHTML = ""; // تصفير القائمة القديمة
+    const uniqueEmployees = new Set();
+
+    // 1️⃣ أولاً: هنقرا من مصفوفة الإجازات بالكامل لو السيرفر باعتها
+    if (window.cachedAllLeaves && cachedAllLeaves.length > 0) {
+        cachedAllLeaves.forEach(l => {
+            if (l.code && l.name) {
+                const empKey = `${l.code}-${l.name}`;
+                if (!uniqueEmployees.has(empKey)) {
+                    uniqueEmployees.add(empKey);
+                    createOptionElement(datalist, l.code, l.name);
+                }
+            }
+        });
+    }
+
+    // 2️⃣ ثانياً (الأضمن): هنلف على جدول الطلبات المفتوح في الشاشة ونلقط منه أي موظف ظاهر
+    // هنبحث عن كل الصفوف جوه جداول المدير
+    const tableRows = document.querySelectorAll("table tbody tr");
     
+    tableRows.forEach(row => {
+        // افترضنا هنا إن الكود في العمود الأول والاسم في العمود الثاني بناءً على تنسيق جدولك
+        // لو الترتيب عندك مختلف، غير الأرقام [0] و [1] بالترتيب الصح في جدولك
+        const codeCell = row.cells[0]; 
+        const nameCell = row.cells[1];
+
+        if (codeCell && nameCell) {
+            const code = codeCell.innerText.trim();
+            const name = nameCell.innerText.trim();
+
+            // تأكد إن الداتا مش أسامي أعمدة (عشان م يلقطش كلمة "الكود" أو "الاسم")
+            if (code && name && !isNaN(code)) { 
+                const empKey = `${code}-${name}`;
+                if (!uniqueEmployees.has(empKey)) {
+                    uniqueEmployees.add(empKey);
+                    createOptionElement(datalist, code, name);
+                }
+            }
+        }
+    });
+}
+
+// دالة مساعدة لإنشاء عنصر الخيار داخل القائمة
+function createOptionElement(datalist, code, name) {
+    const option = document.createElement('option');
+    option.value = code; // الكود هو القيمة المخفية للبحث
+    option.innerText = name; // الاسم يظهر كشرح للمدير
+    datalist.appendChild(option);
+}
+
+// 👑 دالة تطلب كل الموظفين من الجوجل شيت مباشرة وتملأ القائمة الذكية
+function fetchAllEmployeesFromSheet() {
+    const datalist = document.getElementById('emp-list');
+    if (!datalist) return;
+
+    // بنكلم نفس الرابط بتاعك بس بنبعت أكشن جديد خالص اسمه getAllEmployees
+    fetch(`${SCRIPT_URL}?action=getAllEmployees`)
+    .then(res => res.json())
+    .then(employees => {
+        if (employees && employees.length > 0) {
+            datalist.innerHTML = ""; // تصفير القائمة
+            
+            employees.forEach(emp => {
+                if (emp.code && emp.name) {
+                    const option = document.createElement('option');
+                    option.value = emp.code; // الكود اللي هيتبحث بيه
+                    option.innerText = emp.name; // الاسم اللي هيظهر للمدير
+                    datalist.appendChild(option);
+                }
+            });
+            console.log("✅ تم تحميل جميع موظفين الشيت بنجاح في القائمة الذكية!");
+        }
+    })
+    .catch(err => console.error("خطأ أثناء جلب الموظفين من الشيت:", err));
+}
+
+// 👑 دالة الاستعلام اللحظي - مخصصة بالكامل لعرض الرصيد المتبقي للموظف المختار
+function lookupBalanceByCode() {
+    const codeInput = document.getElementById('lookup-emp-code').value.trim().toLowerCase();
+    const nameBar = document.getElementById('lookup-name-bar');
+    const nameLabel = document.getElementById('lbl-lookup-name');
+    
+    // ربط الكروت الثلاثة الكبيرة اللي عندك في اللوحة
+    const statsAnnual = document.getElementById('mgr-total-annual');
+    const statsCasual = document.getElementById('mgr-total-casual');
+    const statsHoliday = document.getElementById('mgr-total-holiday');
+
+    // ربط الخانات الصغيرة اللي تحت الرقم (الشرطة)
+    const remAnnual = document.getElementById('mgr-rem-annual');
+    const remCasual = document.getElementById('mgr-rem-casual');
+    const remHoliday = document.getElementById('mgr-rem-holiday');
+
+    // 1️⃣ لو خانة البحث فضيت.. صفر الكروت فوراً ورجعها لـ 0 يوم
     if (codeInput === "") {
-        previewBar.style.display = "none";
+        if (nameBar) nameBar.style.display = "none";
+        if (statsAnnual) statsAnnual.innerText = "0 يوم";
+        if (statsCasual) statsCasual.innerText = "0 يوم";
+        if (statsHoliday) statsHoliday.innerText = "0 يوم";
+        if (remAnnual) remAnnual.innerText = "--";
+        if (remCasual) remCasual.innerText = "--";
+        if (remHoliday) remHoliday.innerText = "--";
         return;
     }
     
-    // البحث عن كود الموظف داخل الطلبات المخزنة في الكاش لجلب الاسم فوراً
-    let targetRecord = cachedAllLeaves.find(l => l.code && l.code.toLowerCase() === codeInput);
+    // 2️⃣ البحث عن الموظف المختار جوه الكاش (cachedAllLeaves)
+    let targetRecord = cachedAllLeaves.find(l => l.code && l.code.toString().toLowerCase() === codeInput);
     
-    if (targetRecord && targetRecord.name) {
-        nameLabel.innerText = targetRecord.name;
-        previewBar.style.display = "block"; // إظهار شريط الاسم باللون الأزرق البروفيشنال
+    if (targetRecord) {
+        // إظهار بار الاسم وتلوينه بالأخضر الهادي
+        if (nameLabel) nameLabel.innerText = targetRecord.name;
+        if (nameBar) {
+            nameBar.style.display = "block";
+            nameBar.style.backgroundColor = "#e6f9f0"; 
+            nameBar.style.color = "#10b981";
+        }
+        
+        // 3️⃣ تحديث الكروت بالرصيد المتبقي للموظف الفعلي القادم من الشيت
+        if (statsAnnual) statsAnnual.innerText = (targetRecord.annualBalance !== undefined ? targetRecord.annualBalance : 0) + " يوم";
+        if (statsCasual) statsCasual.innerText = (targetRecord.casualBalance !== undefined ? targetRecord.casualBalance : 0) + " يوم";
+        if (statsHoliday) statsHoliday.innerText = (targetRecord.holidayBalance !== undefined ? targetRecord.holidayBalance : 0) + " يوم";
+        
+        // تغيير الشرطة لـ "رصيد متاح" عشان المدير يعرف المتبقي كام
+        if (remAnnual) remAnnual.innerText = "رصيد متاح";
+        if (remCasual) remCasual.innerText = "رصيد متاح";
+        if (remHoliday) remHoliday.innerText = "رصيد متاح";
     } else {
-        nameLabel.innerText = "جاري البحث عن الكود أو الكود غير مسجل بطلب سابق...";
-        previewBar.style.display = "block";
+        // 4️⃣ لو كتب كود مش متسجل في الكاش لسه
+        if (nameLabel) nameLabel.innerText = "جاري البحث أو الكود غير مسجل بطلب سابق...";
+        if (nameBar) {
+            nameBar.style.display = "block";
+            nameBar.style.backgroundColor = "#fff7ed"; 
+            nameBar.style.color = "#c2410c";
+        }
+        
+        if (statsAnnual) statsAnnual.innerText = "0 يوم";
+        if (statsCasual) statsCasual.innerText = "0 يوم";
+        if (statsHoliday) statsHoliday.innerText = "0 يوم";
+        if (remAnnual) remAnnual.innerText = "--";
+        if (remCasual) remCasual.innerText = "--";
+        if (remHoliday) remHoliday.innerText = "--";
     }
 }

@@ -146,6 +146,52 @@
         .btn-action.edit-btn { background-color: #e0e8f6; color: #4e6edb; } 
         .btn-action.delete-btn { background-color: #fdf2f2; color: #ef4444; }
 
+
+        /* ==================== 🔍 تنسيق بوكس الاستعلام الجديد للمدير ==================== */
+.lookup-box {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 18px;
+    border: 2px dashed #6584f1; /* خط منقط أزرق يعطي شكل استعلام احترافي */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+    width: 100%;
+}
+
+.lookup-box h3 {
+    font-size: 16px;
+    color: #333333;
+    margin-bottom: 20px;
+    font-weight: 700;
+    border-bottom: 2px solid #f0f2f7;
+    padding-bottom: 10px;
+}
+
+.lookup-wrapper {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+}
+
+.lookup-input {
+    flex: 1;
+}
+
+.lookup-name-bar {
+    background-color: #f0f4fe;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4e6edb;
+    display: none; /* مخفي تلقائياً وينطق بالـ JS */
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+
         @media (max-width: 768px) {
             body { padding: 12px; align-items: flex-start; width: 100vw; overflow-x: hidden; } 
             .login-container { flex-direction: column; width: 100%; max-width: 400px; height: auto; }
@@ -169,4 +215,9 @@
             .filter-group input, .filter-group select { width: 65% !important; padding: 8px 10px; box-sizing: border-box !important; } 
             table { font-size: 13px; }
             th, td { padding: 10px 8px; }
+
+            /* تجاوب بوكس الاستعلام على الموبايل */
+            .lookup-box { padding: 16px !important; border-radius: 14px !important; margin-bottom: 16px !important; }
+            .lookup-wrapper { flex-direction: column; align-items: stretch; gap: 10px; }
+            .lookup-name-bar { text-align: center; white-space: normal; width: 100%; justify-content: center; padding: 10px; font-size: 13px; }
         }
